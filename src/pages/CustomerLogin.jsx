@@ -26,7 +26,7 @@ function CustomerLogin() {
     const handleSignupSubmit = async () => {
         try {
             await signup({ name: signupName, email: signupEmail, password: signupPassword, userType: 'customer' });
-            navigate('/customer-login');  // Redirect to login after successful signup
+            navigate('/create-art');  // Redirect to login after successful signup
         } catch (error) {
             console.error("Signup error:", error.response?.data || error.message);
         }

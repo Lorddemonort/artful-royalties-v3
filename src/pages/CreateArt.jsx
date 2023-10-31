@@ -8,15 +8,27 @@ function CreateArt() {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
-    const handleGenerateArt = () => {
-        // Here you can call the API to generate the art
-        // For now, I'll just simulate adding a new art to the history
-        const newArt = {
-            imageUrl: 'path_to_generated_art.jpg', // this should come from the API
-            cost: 10 // this should come from the API
-        };
-        setHistory(prev => [newArt, ...prev]);
-        setTokenBalance(prev => prev - newArt.cost);
+    const handleGenerateArt = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/generate-art', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ textPrompts: prompt })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                // Handle the generated images (e.g., display them or save their URLs)
+                setHistory(prev => [...data.images.map(url => ({ imageUrl: url, cost: 10 })), ...prev]);
+                setTokenBalance(prev => prev - 10);  // Assuming a fixed cost for now
+            } else {
+                console.error("Art generation failed:", data.message);
+            }
+        } catch (error) {
+            console.error("Art generation error:", error);
+        }
     };
 
     const artists = [  // Placeholder data
