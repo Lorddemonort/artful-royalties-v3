@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login, signup } from '../api/auth';
 
 function ArtistLogin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     // For Signup
     const [isSignup, setIsSignup] = useState(false);
@@ -10,12 +13,23 @@ function ArtistLogin() {
     const [signupEmail, setSignupEmail] = useState('');
     const [signupPassword, setSignupPassword] = useState('');
 
-    const handleLoginSubmit = () => {
-        // Implement API call for login here
+    const handleLoginSubmit = async () => {
+      try {
+          const { token } = await login({ email, password });
+          localStorage.setItem('authToken', token);
+          navigate('/artists-dashboard');
+      } catch (error) {
+          console.error("Login error:", error.response?.data || error.message);
+      }
     };
 
-    const handleSignupSubmit = () => {
-        // Implement API call for signup here
+    const handleSignupSubmit = async () => {
+      try {
+          await signup({ name: signupName, email: signupEmail, password: signupPassword, userType: 'artist' });
+          navigate('/artists-dashboard');  // Redirect to login after successful signup
+      } catch (error) {
+          console.error("Signup error:", error.response?.data || error.message);
+      }
     };
 
     return (
