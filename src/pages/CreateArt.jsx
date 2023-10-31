@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
+import Loader from '../components/Loader.jsx'; // Adjust this import path if necessary
 
 function CreateArt() {
     const [prompt, setPrompt] = useState('');
     const [tokenBalance, setTokenBalance] = useState(100); // Example initial value
     const [history, setHistory] = useState([]);
+    const [isLoading, setIsLoading] = useState(false); // New state for loading
     const [selectedArtist, setSelectedArtist] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
     const handleGenerateArt = async () => {
+        setIsLoading(true); // Start loading
         try {
             const response = await fetch('http://localhost:5000/api/generate-art', {
                 method: 'POST',
@@ -20,15 +23,15 @@ function CreateArt() {
 
             const data = await response.json();
             if (data.success) {
-                // Handle the generated images (e.g., display them or save their URLs)
                 setHistory(prev => [...data.images.map(url => ({ imageUrl: url, cost: 10 })), ...prev]);
-                setTokenBalance(prev => prev - 10);  // Assuming a fixed cost for now
+                setTokenBalance(prev => prev - 10); // Assuming a fixed cost for now
             } else {
                 console.error("Art generation failed:", data.message);
             }
         } catch (error) {
             console.error("Art generation error:", error);
         }
+        setIsLoading(false); // Stop loading
     };
 
     const artists = [  // Placeholder data
@@ -51,7 +54,7 @@ function CreateArt() {
     };
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-full">
             {/* Navbar */}
             <div className="p-3 bg-[#cedada] text-black rounded-md">
                 User Token Balance: {tokenBalance}
@@ -62,19 +65,29 @@ function CreateArt() {
                 {/* History Column */}
                 <div className="w-1/4 overflow-y-auto">
                     <div>
-                        <div className='text-black justify-center align-middle my-5 mx-16 font-bold text-xl'><h2 >Your Creations-</h2></div>
-                    {history.map((art, index) => (
-                        <div key={index} className="p-2 border-b">
-                            <img src={art.imageUrl} alt="Generated Art" className="w-full h-32 object-cover" />
-                            <div>Cost: {art.cost}</div>
-                        </div>
-                    ))}
+                        <div className='text-black justify-center align-middle my-5 mx-16 font-bold text-xl'><h2>Your Creations-</h2></div>
+                        {history.map((art, index) => (
+                            <div key={index} className="p-2 border-b">
+                                <img src={art.imageUrl} alt="Generated Art" className="w-full h-32 object-cover" />
+                                <div>Cost: {art.cost}</div>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
                 {/* Central Image Display and Prompt */}
                 <div className="w-1/2 flex flex-col items-center p-4">
-                    <div className="flex-grow bg-gray-300 w-full rounded-md h-10"></div> {/* Placeholder for the generated image */}
+                    {isLoading ? (
+                        <div className="flex-grow bg-gray-300 w-full rounded-md h-10 px-20 py-20">
+                            <div className="flex-col items-center mx-20 my-20">
+                            <Loader/> <br></br><div>Please wait while your creation is blooming...</div>
+                            </div>
+                        </div>
+                    ) : history.length > 0 ? (
+                        <img src={history[0].imageUrl} alt="Generated Art" className="flex-grow w-full rounded-md" />
+                    ) : (
+                        <div className="flex-grow bg-gray-300 w-full rounded-md h-10"></div> // Placeholder
+                    )}
                     <div className="flex mt-4 w-full">
                         <input 
                             type="text" 
