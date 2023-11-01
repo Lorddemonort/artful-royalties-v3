@@ -4,6 +4,7 @@ function ArtistsDashboard() {
     const [artworks, setArtworks] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [styleDescription, setStyleDescription] = useState(''); // New state for style description
+    const [tokenBalance, setTokenBalance] = useState(0); // New state for token balance
 
     useEffect(() => {
         // Fetch artworks of the logged-in artist from the backend
@@ -27,7 +28,30 @@ function ArtistsDashboard() {
     
         fetchArtworks();
     }, []);
+
+    useEffect(() => {
+        // Fetch artworks and token balance of the logged-in artist from the backend
+        const fetchArtistData = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/get-artist-data', {
+                    headers: {
+                      'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    setArtworks(data.artworks);
+                    setTokenBalance(data.tokenBalance); // Set the token balance
+                } else {
+                    console.error("Failed to fetch artist data:", data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching artist data:", error);
+            }
+        };
     
+        fetchArtistData();
+    }, []);
 
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
@@ -88,6 +112,7 @@ function ArtistsDashboard() {
             <h1 className="text-2xl mb-4">Your Artworks</h1>
             
             <div className="mb-4">
+                <div className="text-lg">Token Balance: {tokenBalance}</div> {/* Display token balance */}
                 <input type="file" onChange={handleFileChange} />
                 <button onClick={handleUpload} className="ml-2 bg-blue-500 text-white p-2 rounded">Upload Artwork</button>
             </div>

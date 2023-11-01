@@ -268,3 +268,23 @@ app.put('/api/update-style', authenticateJWT, async (req, res) => {
         res.status(500).json({ success: false, message: "Server error" });
     }
 });
+
+// Get Artist Data Endpoint
+app.get('/api/get-artist-data', authenticateJWT, async (req, res) => {
+    try {
+        const artistId = req.user.userId; // Get the artist ID from the JWT
+        const artist = await User.findById(artistId);
+        const artworks = await Artwork.find({ artistId: artistId });
+
+        if (!artist) return res.status(404).json({ success: false, message: "Artist not found" });
+
+        res.json({ 
+            success: true, 
+            artworks: artworks, 
+            tokenBalance: artist.tokenBalance // Send the token balance
+        });
+    } catch (error) {
+        console.error("Error fetching artist data:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
