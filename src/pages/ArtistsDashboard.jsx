@@ -6,13 +6,25 @@ function ArtistsDashboard() {
 
     useEffect(() => {
         // Fetch artworks of the logged-in artist from the backend
-        const fetchedArtworks = [
-            // Placeholder data
-            { imageUrl: "path_to_art1.jpg", timesUsed: 5 },
-            { imageUrl: "path_to_art2.jpg", timesUsed: 3 },
-            // ... more artworks
-        ];
-        setArtworks(fetchedArtworks);
+        const fetchArtworks = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/get-artworks', {
+                    headers: {
+                      'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    setArtworks(data.artworks);
+                } else {
+                    console.error("Failed to fetch artworks:", data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching artworks:", error);
+            }
+        };
+    
+        fetchArtworks();
     }, []);
 
     const handleFileChange = (event) => {
@@ -28,7 +40,7 @@ function ArtistsDashboard() {
 
         try {
             // Make sure to update the endpoint URL
-            const response = await fetch('/api/upload-artwork', {
+            const response = await fetch('http://localhost:5000/api/upload-artwork', {
                 method: 'POST',
                 headers: {
                   'Authorization': 'Bearer ' + localStorage.getItem('authToken')
