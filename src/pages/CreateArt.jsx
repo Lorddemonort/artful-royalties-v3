@@ -48,6 +48,8 @@ function CreateArt() {
         const artistStyle = selectedArtist.styleDescription;
         const combinedPrompt = `${prompt}. ${artistStyle}`;
 
+        console.log(selectedArtist)
+        
         try {
             const response = await fetch('http://localhost:5000/api/generate-art', {
                 method: 'POST',
@@ -139,7 +141,7 @@ function CreateArt() {
                 {/* Central Image Display and Prompt */}
                 <div className="w-1/2 flex flex-col items-center p-4">
                     {isLoading ? (
-                        <div className="flex-grow bg-gray-300 w-full rounded-md h-10 px-20 py-20">
+                        <div className="flex-grow bg-gray-300 w-full rounded-md h-72 px-20 py-20">
                             <div className="flex-col items-center mx-20 my-20">
                             <Loader/> <br></br><div>Please wait while your creation is blooming...</div>
                             </div>
@@ -147,7 +149,7 @@ function CreateArt() {
                     ) : history.length > 0 ? (
                         <img src={history[0].imageUrl} alt="Generated Art" className="flex-grow w-full rounded-md" />
                     ) : (
-                        <div className="flex-grow bg-gray-300 w-full rounded-md h-10 px-20 py-20"></div> // Placeholder
+                        <div className="flex-grow bg-white w-full rounded-md h-72 px-20 py-20"></div> // Placeholder
                     )}
                     <div className="flex mt-4 w-full">
                         <input 

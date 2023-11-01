@@ -35,13 +35,16 @@ const authenticateJWT = (req, res, next) => {
 
         jwt.verify(token, 'shafin', (err, user) => {
             if (err) {
+                console.error("JWT Verification Error:", err);
                 return res.sendStatus(403);
             }
 
+            console.log("JWT Decoded User:", user);
             req.user = user;
             next();
         });
     } else {
+        console.error("No Auth Header");
         res.sendStatus(401);
     }
 };
@@ -52,7 +55,8 @@ const UserSchema = new mongoose.Schema({
     email: String,
     password: String,
     userType: String, // 'artist' or 'customer'
-    tokenBalance: { type: Number, default: 100 } // Add this line
+    tokenBalance: { type: Number, default: 100 },
+    styleDescription: String // Added this line
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -71,7 +75,8 @@ app.post('/signup', async (req, res) => {
             email,
             password: hashedPassword,
             userType,
-            tokenBalance: 100 // Add this line
+            tokenBalance: 100,
+            styleDescription: req.body.styleDescription
         });
 
         await newUser.save();
@@ -121,6 +126,9 @@ app.post('/api/generate-art', authenticateJWT, async (req, res) => {
         Authorization: "Bearer sk-vxMJbaPqTIy61FC1FxUgrEmvFgVkZzb1BQXJloKOEnT1g5f1"
     };
 
+    console.log("Received artistId:", artistId); // Debug log
+    console.log("Decoded customerId from JWT:", customerId); // Debug log
+
     const body = {
         steps: 40,
         width: 1024,
@@ -157,6 +165,16 @@ app.post('/api/generate-art', authenticateJWT, async (req, res) => {
 
         if (!customer || !artist) {
             throw new Error("User not found");
+        }
+
+        if (!customer) {
+            console.error("Customer not found with ID:", customerId); // Debug log
+            return res.status(404).json({ success: false, message: "Customer not found" });
+        }
+    
+        if (!artist) {
+            console.error("Artist not found with ID:", artistId); // Debug log
+            return res.status(404).json({ success: false, message: "Artist not found" });
         }
 
         customer.tokenBalance -= tokenCost;
@@ -214,8 +232,10 @@ app.get('/api/get-artists', authenticateJWT, async (req, res) => {
             const artworks = await Artwork.find({ artistId: artist._id }).limit(5);
             return {
                 name: artist.name,
+                _id: artist._id, // Include this line to add the _id field
                 imageUrl: artworks.length > 0 ? artworks[0].imageUrl : '',
-                artworks: artworks
+                artworks: artworks,
+                styleDescription: artist.styleDescription // Add this line
             };
         }));
 
@@ -228,4 +248,23 @@ app.get('/api/get-artists', authenticateJWT, async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+});
+
+// Add an endpoint for artists to update their style description
+app.put('/api/update-style', authenticateJWT, async (req, res) => {
+    const { styleDescription } = req.body;
+    const artistId = req.user.userId;
+
+    try {
+        const artist = await User.findById(artistId);
+        if (!artist) return res.status(404).send("Artist not found");
+
+        artist.styleDescription = styleDescription;
+        await artist.save();
+
+        res.json({ success: true, message: "Style description updated" });
+    } catch (error) {
+        console.error("Update style description error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
 });
