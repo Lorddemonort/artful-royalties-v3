@@ -109,7 +109,52 @@ const Artwork = mongoose.model('Artwork', ArtworkSchema);
 
 // Stable Diffusion API Endpoint
 app.post('/api/generate-art', async (req, res) => {
-    // ... your existing code
+    //Stable Diffussion API from stability.ai to generate ai art
+app.post('/api/generate-art', async (req, res) => {
+    const { textPrompts } = req.body;
+    const apiUrl = "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image";
+    const headers = {
+        Accept: "application/json",
+        "Content-Type": "application/json", // Added this line to solve issue of header structure
+        Authorization: "Bearer sk-vxMJbaPqTIy61FC1FxUgrEmvFgVkZzb1BQXJloKOEnT1g5f1"
+    };
+
+    const body = {
+        steps: 40,
+        width: 1024,
+        height: 1024,
+        seed: 0,
+        cfg_scale: 5,
+        samples: 1,
+        text_prompts: [{ "text": textPrompts, "weight": 1 }]
+    };
+
+    try {
+        const response = await fetch(apiUrl, {
+            headers,
+            method: "POST",
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Non-200 response: ${await response.text()}`);
+        }
+
+        const responseJSON = await response.json();
+
+        // Save images and send back URLs
+        const imageUrls = responseJSON.artifacts.map((image, index) => {
+            const imagePath = path.join('uploads', `txt2img_${image.seed}.png`);
+            fs.writeFileSync(imagePath, Buffer.from(image.base64, 'base64'));
+            return `${req.protocol}://${req.get('host')}/uploads/txt2img_${image.seed}.png`;
+        });
+
+        res.json({ success: true, images: imageUrls });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 });
 
 // Multer Configuration

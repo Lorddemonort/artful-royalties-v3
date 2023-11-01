@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Loader from '../components/Loader.jsx'; // Adjust this import path if necessary
 
 function CreateArt() {
@@ -9,16 +9,44 @@ function CreateArt() {
     const [selectedArtist, setSelectedArtist] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [artists, setArtists] = useState([]); // State to hold artists data
+
+    // Fetch artists and their styles from MongoDB
+    useEffect(() => {
+        const fetchArtists = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/get-artists', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    setArtists(data.artists);
+                    setSearchResults(data.artists.slice(0, 2)); // Default suggested artists
+                } else {
+                    console.error("Failed to fetch artists:", data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching artists:", error);
+            }
+        };
+
+        fetchArtists();
+    }, []);
 
     const handleGenerateArt = async () => {
         setIsLoading(true); // Start loading
+        const artistStyle = selectedArtist ? selectedArtist.styleDescription : '';
+        const combinedPrompt = `${prompt}. ${artistStyle}`;
+
         try {
             const response = await fetch('http://localhost:5000/api/generate-art', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ textPrompts: prompt })
+                body: JSON.stringify({ textPrompts: combinedPrompt })
             });
 
             const data = await response.json();
@@ -34,19 +62,15 @@ function CreateArt() {
         setIsLoading(false); // Stop loading
     };
 
-    const artists = [  // Placeholder data
-        { name: "Sam Does Art", imageUrl: "src/assets/samdoesart.jpg" },
-        { name: "Lemonade Art", imageUrl: "src/assets/lemonadeart.png" },
-        { name: "Hotfrost", imageUrl: "src/assets/hotfrost.jpg" },
-        { name: "Azekeil 3d", imageUrl: "src/assets/azeikel.png" },
-        // ... (more artists)
-    ];
-
-    const suggestedArtists = artists.slice(0, 2);
+    const handleArtistSelection = (artist) => {
+        setSelectedArtist(artist);
+        setSearchTerm(artist.name);
+        setSearchResults([]);
+    };
 
     const handleSearch = (term) => {
         if (!term) {
-            setSearchResults(suggestedArtists);
+            setSearchResults(artists.slice(0, 2));
         } else {
             const results = artists.filter(artist => artist.name.toLowerCase().includes(term.toLowerCase()));
             setSearchResults(results);
@@ -120,9 +144,13 @@ function CreateArt() {
                     </div>
                     
                     {searchResults.map((artist, index) => (
-                        <div key={index} className="mb-4">
+                        <div key={index} className="mb-4 cursor-pointer" onClick={() => handleArtistSelection(artist)}>
                             <div className="font-bold">{artist.name}</div>
-                            <img src={artist.imageUrl} alt={`Preview of ${artist.name}`} className="w-full h-40 object-cover rounded-md mt-4" />
+                            <div className="flex overflow-x-auto">
+                                {artist.artworks.slice(0, 5).map((artwork, idx) => (
+                                    <img key={idx} src={artwork.imageUrl} alt={`Preview of ${artist.name}`} className="w-40 h-40 object-cover rounded-md mr-2" />
+                                ))}
+                            </div>
                         </div>
                     ))}
                 </div>
