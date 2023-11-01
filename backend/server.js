@@ -107,9 +107,7 @@ const ArtworkSchema = new mongoose.Schema({
 
 const Artwork = mongoose.model('Artwork', ArtworkSchema);
 
-// Stable Diffusion API Endpoint
-app.post('/api/generate-art', async (req, res) => {
-    //Stable Diffussion API from stability.ai to generate ai art
+//Stable Diffussion API from stability.ai to generate ai art
 app.post('/api/generate-art', async (req, res) => {
     const { textPrompts } = req.body;
     const apiUrl = "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image";
@@ -154,7 +152,6 @@ app.post('/api/generate-art', async (req, res) => {
         console.error(error);
         res.status(500).json({ success: false, message: error.message });
     }
-});
 });
 
 // Multer Configuration
