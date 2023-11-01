@@ -19,6 +19,7 @@ const Home = () => {
             </div>
             <img src={heroimage} alt="hero" className="w-3/5"/>
         </div>
+        <div>&copy; Artful Royalties - Project by Shafin Shaikh, Gandhar Date, Pranay Mohature and Advait Bhore</div>
     </section>
   )
 }
