@@ -5,6 +5,8 @@ function ArtistsDashboard() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [styleDescription, setStyleDescription] = useState(''); // New state for style description
     const [tokenBalance, setTokenBalance] = useState(0); // New state for token balance
+    const [artistName, setArtistName] = useState(''); // New state for artist's name
+
 
     useEffect(() => {
         // Fetch artworks of the logged-in artist from the backend
@@ -42,6 +44,7 @@ function ArtistsDashboard() {
                 if (data.success) {
                     setArtworks(data.artworks);
                     setTokenBalance(data.tokenBalance); // Set the token balance
+                    setArtistName(data.name); // Set the artist's name
                 } else {
                     console.error("Failed to fetch artist data:", data.message);
                 }
@@ -109,6 +112,7 @@ function ArtistsDashboard() {
 
     return (
         <div>
+            <h1 className="text-2xl mb-4">Welcome, {artistName}</h1> {/* Display the welcome message with artist's name */}
             <h1 className="text-2xl mb-4">Your Artworks</h1>
             
             <div className="mb-4">

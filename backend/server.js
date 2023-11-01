@@ -279,7 +279,8 @@ app.get('/api/get-artist-data', authenticateJWT, async (req, res) => {
         if (!artist) return res.status(404).json({ success: false, message: "Artist not found" });
 
         res.json({ 
-            success: true, 
+            success: true,
+            name: artist.name, // Include the artist's name in the response 
             artworks: artworks, 
             tokenBalance: artist.tokenBalance // Send the token balance
         });
