@@ -1,8 +1,5 @@
-# React + Vite
+# React + Vite + TailwindCSS + MongoDB Atlas + ExpressJS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Artful Royalties is a project to provide royalties to artists whose artwork is being used in AI art generation
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+You can access the webapp via - https://shafinshaikh.github.io/artful-royalties-v3/
