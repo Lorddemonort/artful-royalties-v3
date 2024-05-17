@@ -1,8 +1,7 @@
 import React from 'react';
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes, Navigate } from 'react-router-dom';
 import { logo } from "./assets";
 import { Home, CreateArt, ArtistLogin, CustomerLogin, ArtistsDashboard } from "./pages";
-
 
 const App = () => {
   return (
@@ -18,14 +17,15 @@ const App = () => {
         </div>
       </header>
 
-      <main className='sm:p-8 px-4 py-8 w-full bg-gradient-to-r from-[#40baba] via-[#2591B9] to-[#393939]  min-h-[calc(100vh-73px)]'>
+      <main className='sm:p-8 px-4 py-8 w-full bg-gradient-to-r from-[#40baba] via-[#2591B9] to-[#393939] min-h-[calc(100vh-73px)]'>
         <Routes>
-          <Route path="/create-art" element={<CreateArt />}/>
-          <Route path="/artist-login" element={<ArtistLogin />}/>
-          <Route path="/customer-login" element={<CustomerLogin />}/>
-          <Route path="/artists-dashboard" element={<ArtistsDashboard />}/>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Navigate to="/" />} />
+          <Route path="/create-art" element={<CreateArt />} />
+          <Route path="/artist-login" element={<ArtistLogin />} />
+          <Route path="/customer-login" element={<CustomerLogin />} />
+          <Route path="/artists-dashboard" element={<ArtistsDashboard />} />
         </Routes>
-        <Home />
       </main>
     </BrowserRouter>
   )
