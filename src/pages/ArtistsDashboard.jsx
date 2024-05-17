@@ -118,7 +118,7 @@ function ArtistsDashboard() {
             <div className="mb-4">
                 <div className="text-lg">Token Balance: {tokenBalance}</div> {/* Display token balance */}
                 <input type="file" onChange={handleFileChange} />
-                <button onClick={handleUpload} className="ml-2 bg-blue-500 text-white p-2 rounded">Upload Artwork</button>
+                <button onClick={handleUpload} className="ml-2 bg-black text-white p-2 rounded">Upload Artwork</button>
             </div>
             
             <div className="mb-4">
@@ -128,7 +128,7 @@ function ArtistsDashboard() {
                     placeholder="Describe your art style..."
                     className="w-full p-2 border rounded-md"
                 />
-                <button onClick={handleUpdateStyleDescription} className="mt-2 bg-blue-500 text-white p-2 rounded">Update Style Description</button>
+                <button onClick={handleUpdateStyleDescription} className="mt-2 bg-black text-white p-2 rounded">Update Style Description</button>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
